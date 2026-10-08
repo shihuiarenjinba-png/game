@@ -89,3 +89,34 @@ test("offline UI changes modes and retains real results in local save",()=>{
  if(now.pending)click("stand");
  const end=JSON.parse(map["luck-lab-arcade-v1"]);assert.equal(end.rounds,3);assert.match(html,/ブラックジャック/);G.validate(end);
 });
+
+test("dealer challenge publishes its special rule and increases dealer victories without changing hidden odds per hand",()=>{
+ let standardLoss=0,challengeLoss=0,challengeWin=0;
+ const n=2000;
+ for(let seed=1;seed<=n;seed++){
+   for(const [mode,count] of [["standard",false],["challenge",true]]){
+     const s=G.newGame(seed);
+     G.setHouseMode(s,mode);G.blackjack(s,50);
+     if(s.pending){if(G.score(s.pending.player)<=16)G.hit(s);if(s.pending)G.stand(s)}
+     G.validate(s);
+     if(count){challengeLoss+=!s.last.won;challengeWin+=s.last.won}
+     else standardLoss+=!s.last.won&&s.last.outcome!=="push";
+     assert.equal(s.last.net,s.last.paid-s.last.amount);
+     assert.equal(s.last.houseMode,mode);
+   }
+ }
+ assert.ok(challengeLoss/n>.65,"dealer should win most under clearly labeled special house rules");
+ assert.ok(challengeLoss>standardLoss,"special rules increase dealer advantage");
+ assert.ok(challengeWin>0,"player still occasionally wins");
+});
+test("changing rules during an active hand is rejected, and old saved games use standard rules",()=>{
+ const old=G.newGame(41);delete old.houseMode;G.validate(old);
+ G.blackjack(old,50);if(old.pending){
+   assert.throws(()=>G.setHouseMode(old,"challenge"),/進行中/);
+   G.stand(old);
+ }
+ assert.equal(old.last.houseMode,"standard");
+ const s=G.newGame(91);assert.equal(s.houseMode,"challenge");
+ G.setHouseMode(s,"standard");assert.equal(s.houseMode,"standard");
+ assert.throws(()=>G.setHouseMode(s,"impossible"),/不正/);
+});
