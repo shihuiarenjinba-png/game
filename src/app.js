@@ -27,7 +27,8 @@
     '<div class="actions"><button class="button" data-action="'+s.mode+'" '+(unavailable||stake>s.chips?"disabled":"")+'>'+(s.mode==="slots"?"スロットを回す":"ルーレットを回す")+'</button></div>';
     const last=s.last;
     const result=last?'<div class="result '+(last.net<0?"bad":"")+'"><strong>'+(last.game==="roulette"?"出た番号："+last.spin:last.game==="slots"?"絵柄："+last.reels.map(i=>G.SYMBOLS[i]).join(" "):"BJ："+last.playerScore+" 対 "+last.dealerScore)+'</strong><span class="'+(last.net>=0?"positive":"negative")+'">払戻し '+money(last.paid)+'　／　収支 '+(last.net>0?"+":"")+money(last.net)+'</span></div>':'';
-    return controls+slotView+rouletteView+blackView+actions+result;
+    const keyHint=s.mode==="blackjack"?'<p class="sub key-hint">キー操作：H＝ヒット / S＝スタンド / D＝ダブル</p>':'<p class="sub key-hint">キー操作：スペース＝スタート</p>';
+    return controls+slotView+rouletteView+blackView+actions+keyHint+result;
   }
   function render(){
     const stats=[["チップ残高",money(s.chips)],["ラウンド",s.rounds+" / "+G.MAX_ROUNDS],["累積損益",(s.chips>=G.START?"+":"")+money(s.chips-G.START)],["プレイ状態",s.status==="playing"?"PLAYING":s.status==="complete"?"COMPLETE":"GAME OVER"]];
@@ -38,7 +39,7 @@
     const end=s.status!=="playing"?'<div class="end">30ラウンド終了、またはチップ不足でゲーム終了。最終残高 '+money(s.chips)+'</div>':'';
     root.innerHTML='<div class="wrap"><div class="head"><div><div class="pill">OFFLINE VIRTUAL CHIPS ONLY · ALPHA 0.2</div><h1>LUCK <span class="gold">LAB</span></h1><p>3つのミニゲームと運の振れ幅を楽しむ、30ラウンド限定アーケード</p></div><button class="button alt" data-action="restart">最初から遊ぶ</button></div>'+
     (notice?'<div class="result bad">'+esc(notice)+'</div>':'')+
-    '<div class="stats">'+stats.map(v=>'<div class="stat"><small>'+v[0]+'</small><strong>'+v[1]+'</strong></div>').join("")+'</div>'+
+    '<div class="stats">'+stats.map(v=>'<div class="stat"><small>'+v[0]+'</small><strong>'+v[1]+'</strong></div>').join("")+'</div><div class="round-progress" role="progressbar" aria-label="30ラウンドの進捗" aria-valuenow="'+s.rounds+'" aria-valuemin="0" aria-valuemax="'+G.MAX_ROUNDS+'"><div style="width:"'+Math.round(s.rounds/G.MAX_ROUNDS*100)+'%"></div></div>'+
     '<div class="grid"><div>'+panel("ミニゲームを選ぶ",'<div class="tabs">'+[["slots","🎰 スロット"],["roulette","🎯 ルーレット"],["blackjack","🂡 ブラックジャック"]].map(v=>'<button class="button '+(s.mode===v[0]?"active":"alt")+'" data-action="mode" data-mode="'+v[0]+'" '+(s.pending?"disabled":"")+'>'+v[1]+'</button>').join("")+'</div>'+content())+end+'</div>'+
     '<aside>'+panel("直近のラウンド結果",history)+panel("ディーラーの成績",statsBJ)+panel("遊び方と確率",'<ul class="rule"><li>スロットは6絵柄の重み付き抽選。偶然の3一致に高倍率が付きます。</li><li>欧州式ルーレットは0〜36の37枠。赤黒・偶奇は2倍、単一番号は36倍の合計払戻し。</li><li>ブラックジャックには標準ルールとディーラー有利モード。後者はディーラー23点まで有効・引き分けは負け。変更は開始前のみ。</li><li>30ラウンドまで。チップ10C未満になるとゲームオーバー。</li></ul>')+'</aside></div>'+
     '<p class="note">このゲームのチップに金銭的価値はありません。現実のお金による購入、現金化、景品交換、外部送金、外部の賭博サイトとの接続は一切ありません。開発用Alphaであり販売は保留しています。</p></div>';
@@ -59,6 +60,16 @@
       G.validate(s);save();notice="";
     }catch(e){s=JSON.parse(snapshot);notice="操作できませんでした："+e.message}
     render();
+  });
+  document.addEventListener("keydown",event=>{
+    const tag=event.target?.tagName||"";
+    if(["SELECT","INPUT","TEXTAREA","BUTTON"].includes(tag)||event.altKey||event.ctrlKey||event.metaKey)return;
+    const key=event.key.toLowerCase();
+    const action=s.mode==="blackjack"?(key==="h"?"hit":key==="s"?"stand":key==="d"?"double":null):
+      (event.code==="Space"?s.mode:null);
+    if(!action)return;
+    const button=document.querySelector('[data-action="'+action+'"]');
+    if(button&&!button.disabled){event.preventDefault();button.click();}
   });
   render();
 })();
