@@ -9,3 +9,7 @@
 @media(prefers-reduced-motion:reduce){.reel{animation:none}}
 
 .house-rules{border:1px solid #be915e;background:linear-gradient(115deg,#413426,#2a3237);border-radius:11px;padding:11px 14px;margin:10px 0}.house-rules label{color:#ffdc9c}.house-rules .sub{color:#f2d4a9}
+
+.wrap{padding:14px 22px 22px}.head h1{font-size:clamp(28px,4vw,39px)}.head p{margin:1px 0}.stats{margin:12px 0 7px}.stat{padding:9px 13px}.stat strong{font-size:20px}.panel header{padding:10px 14px}.inner{padding:12px 14px}.tabs{margin-bottom:9px}.button{padding:9px 12px}.inputrow{margin:7px 0}.house-rules{padding:7px 11px;margin:5px 0}.house-rules .inputrow{margin:5px 0}.cards{margin:6px 0}.card{height:86px}.actions{margin-top:10px}.round-progress{height:7px;background:#233f40;border-radius:10px;overflow:hidden;margin-bottom:13px}.round-progress>div{height:100%;background:linear-gradient(90deg,#72d4b4,#f1cc7c);border-radius:10px;transition:width .18s ease}.key-hint{margin:7px 0 0}
+@media(max-width:550px){.wrap{padding:12px}.stats{margin-top:9px}.stat{padding:8px}.card{height:77px}}
+@media(prefers-reduced-motion:reduce){.round-progress>div{transition:none}}
