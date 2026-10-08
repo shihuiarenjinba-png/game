@@ -19,7 +19,11 @@ async function testUi(){
  await runJS("document.querySelector('[data-mode=blackjack]').click()");
  await click("blackjack");
  const pending=await runJS("Boolean(JSON.parse(localStorage.getItem('luck-lab-arcade-v1')).pending)");
- if(pending)await click("stand");
+ if(pending){
+   await runJS("document.dispatchEvent(new KeyboardEvent('keydown',{key:'s',bubbles:true}))");
+ }
+ assert.equal(await runJS("Boolean(document.querySelector('.round-progress'))"),true);
+ assert.equal(await runJS("document.querySelector('.round-progress').getAttribute('aria-valuenow')"),"3");
  assert.equal(await runJS("JSON.parse(localStorage.getItem('luck-lab-arcade-v1')).rounds"),3);
  await image("04-blackjack");
  win.setSize(900,700);await image("05-compact");
