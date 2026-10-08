@@ -71,7 +71,7 @@
   function settleBlackjack(s){
     const h=s.pending;if(!h)throw Error("進行中のブラックジャックがありません");
     const playerScore=score(h.player);let dealerScore=score(h.dealer);
-    if(playerScore<=21&&!isNatural(player))while(dealerScore<17){h.dealer.push(newCard(s));dealerScore=score(h.dealer)}
+    if(playerScore<=21&&!isNatural(h.player))while(dealerScore<17){h.dealer.push(newCard(s));dealerScore=score(h.dealer)}
     const playerBJ=isNatural(h.player),dealerBJ=isNatural(h.dealer);
     const outcome=playerScore>21?"lose":dealerScore>21?"win":playerBJ&&!dealerBJ?"blackjack":dealerBJ&&!playerBJ?"lose":playerScore>dealerScore?"win":playerScore<dealerScore?"lose":"push";
     const multiplier=outcome==="blackjack"?2.5:outcome==="win"?2:outcome==="push"?1:0;
