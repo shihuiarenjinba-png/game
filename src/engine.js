@@ -9,13 +9,13 @@
   function rng(s){s.seed=(Math.imul(s.seed,1664525)+1013904223)>>>0;return s.seed/4294967296}
   function draw(s,max){return Math.floor(rng(s)*max)}
   function newGame(seed=1234567){
-    return {version:1,seed:seed>>>0||1,chips:START,rounds:0,maxRounds:MAX_ROUNDS,mode:"slots",pending:null,last:null,status:"playing",
+    return {version:1,seed:seed>>>0||1,chips:START,rounds:0,maxRounds:MAX_ROUNDS,mode:"slots",houseMode:"challenge",pending:null,last:null,status:"playing",
       ledger:[{kind:"START",amount:START,round:0}],history:[]};
   }
   function validate(s){
     if(!s||s.version!==1||!Number.isInteger(s.seed)||s.seed<0||s.seed>4294967295||!Number.isSafeInteger(s.chips)||s.chips<0||
       !Number.isInteger(s.rounds)||s.rounds<0||s.rounds>MAX_ROUNDS||s.maxRounds!==MAX_ROUNDS||
-      !["slots","roulette","blackjack"].includes(s.mode)||!["playing","complete","bust"].includes(s.status)||
+      !["slots","roulette","blackjack"].includes(s.mode)||(s.houseMode!==undefined&&!["challenge","standard"].includes(s.houseMode))||!["playing","complete","bust"].includes(s.status)||
       !Array.isArray(s.ledger)||s.ledger.length>MAX_ROUNDS*4+1||!Array.isArray(s.history)||s.history.length!==s.rounds)
       throw Error("ゲームの保存データが不正です");
     let total=0;
@@ -64,7 +64,7 @@
     ensureBet(s,amount);
     const player=[newCard(s),newCard(s)],dealer=[newCard(s),newCard(s)];
     change(s,-amount,"BLACKJACK_BET");
-    s.pending={game:"blackjack",stake:amount,player,dealer,canDouble:true};
+    s.pending={game:"blackjack",stake:amount,player,dealer,canDouble:true,houseMode:s.houseMode||"standard"};
     if(isNatural(player)||isNatural(dealer))return settleBlackjack(s);
     validate(s);return s;
   }
@@ -72,17 +72,27 @@
     const h=s.pending;if(!h)throw Error("進行中のブラックジャックがありません");
     const playerScore=score(h.player);let dealerScore=score(h.dealer);
     if(playerScore<=21&&!isNatural(h.player))while(dealerScore<17){h.dealer.push(newCard(s));dealerScore=score(h.dealer)}
-    const playerBJ=isNatural(h.player),dealerBJ=isNatural(h.dealer);
-    const outcome=playerScore>21?"lose":dealerScore>21?"win":playerBJ&&!dealerBJ?"blackjack":dealerBJ&&!playerBJ?"lose":playerScore>dealerScore?"win":playerScore<dealerScore?"lose":"push";
+    const playerBJ=isNatural(h.player),dealerBJ=isNatural(h.dealer),challenge=h.houseMode==="challenge";
+    // An explicitly disclosed fictional challenge, not normal blackjack: the house wins ties
+    // and the dealer may finish on 22 or 23 without busting. No hidden outcome manipulation.
+    const dealerBust=dealerScore>(challenge?23:21);
+    const outcome=playerScore>21?"lose":playerBJ&&!dealerBJ?"blackjack":dealerBJ&&!playerBJ?"lose":
+      dealerBust?"win":playerScore>dealerScore?"win":playerScore<dealerScore?"lose":challenge?"lose":"push";
     const multiplier=outcome==="blackjack"?2.5:outcome==="win"?2:outcome==="push"?1:0;
     const paid=Math.floor(h.stake*multiplier);
     if(paid)change(s,paid,"BLACKJACK_PAYOUT");
-    const result={game:"blackjack",amount:h.stake,paid,net:paid-h.stake,won:outcome==="win"||outcome==="blackjack",outcome,player:h.player.slice(),dealer:h.dealer.slice(),playerScore,dealerScore};
+    const result={game:"blackjack",amount:h.stake,paid,net:paid-h.stake,won:outcome==="win"||outcome==="blackjack",outcome,houseMode:h.houseMode,player:h.player.slice(),dealer:h.dealer.slice(),playerScore,dealerScore};
     s.pending=null;return finish(s,result);
   }
   function hit(s){const h=s.pending;if(!h)throw Error("カードを配ってください");h.player.push(newCard(s));h.canDouble=false;if(score(h.player)>=21)return settleBlackjack(s);validate(s);return s}
   function stand(s){if(!s.pending)throw Error("カードを配ってください");return settleBlackjack(s)}
   function double(s){const h=s.pending;if(!h||!h.canDouble||h.player.length!==2)throw Error("ダブルは最初の2枚だけです");if(s.chips<h.stake)throw Error("追加チップ不足です");change(s,-h.stake,"BLACKJACK_DOUBLE");h.stake*=2;h.canDouble=false;h.player.push(newCard(s));return settleBlackjack(s)}
+  function setHouseMode(s,mode){
+    if(s.pending)throw Error("カード勝負が進行中です");
+    if(!["standard","challenge"].includes(mode))throw Error("難易度が不正です");
+    s.houseMode=mode;
+    validate(s);return s;
+  }
   function setMode(s,mode){if(s.pending)throw Error("カードの勝負を先に終了してください");if(!["slots","roulette","blackjack"].includes(mode))throw Error("ゲームが不正です");s.mode=mode;return s}
-  global.VirtualArcade={START,MAX_ROUNDS,MAX_BET,SYMBOLS,WEIGHTS,THREE,RED,newGame,validate,slots,roulette,blackjack,hit,stand,double,setMode,score};
+  global.VirtualArcade={START,MAX_ROUNDS,MAX_BET,SYMBOLS,WEIGHTS,THREE,RED,newGame,validate,slots,roulette,blackjack,hit,stand,double,setMode,setHouseMode,score};
 })(globalThis);
