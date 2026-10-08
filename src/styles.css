@@ -7,3 +7,5 @@
 .reel:nth-child(3){animation-delay:.16s}
 @keyframes reel-arrive{0%{transform:translateY(-9px) scale(.95);opacity:.6}100%{transform:none;opacity:1}}
 @media(prefers-reduced-motion:reduce){.reel{animation:none}}
+
+.house-rules{border:1px solid #be915e;background:linear-gradient(115deg,#413426,#2a3237);border-radius:11px;padding:11px 14px;margin:10px 0}.house-rules label{color:#ffdc9c}.house-rules .sub{color:#f2d4a9}
