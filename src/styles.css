@@ -15,3 +15,5 @@
 @media(prefers-reduced-motion:reduce){.round-progress>div{transition:none}}
 
 .grid>aside .stats{grid-template-columns:repeat(2,minmax(0,1fr));margin:0 0 6px}.grid>aside .stat{padding:10px 11px}.grid>aside .stat strong{font-size:17px}.grid>aside .round-progress{margin-bottom:13px}.grid>aside .stat small{font-size:11px}@media(max-width:850px){.grid>aside .stats{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:550px){.grid>aside .stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.blackjack-table{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:9px 0}.blackjack-table .hand{min-width:0;border:1px solid #496c68;padding:8px;background:#183038;border-radius:10px}.blackjack-table .cards{flex-wrap:wrap;gap:5px;margin:7px 0 1px}.blackjack-table .card{min-width:47px;width:52px;height:73px;font-size:23px;border-width:2px}.blackjack-table .hand>p{margin:1px 0}@media(max-width:570px){.blackjack-table{grid-template-columns:1fr}.blackjack-table .card{width:53px;height:72px}}
