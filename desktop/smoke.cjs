@@ -11,6 +11,14 @@ async function testUi(){
  await win.loadFile(path.join(__dirname,"..","index.html"));
  assert.match(await runJS("document.body.innerText"),/LUCK LAB/);
  await image("01-start");
+ const chipsBefore=await runJS("JSON.parse(localStorage.getItem('luck-lab-arcade-v1')).chips");
+ await runJS("document.querySelector('[data-action=locale][data-lang=en]').click()");
+ assert.equal(await runJS("document.documentElement.lang"),"en");
+ assert.match(await runJS("document.body.innerText"),/Full Rules, Odds & Payouts/);
+ assert.equal(await runJS("JSON.parse(localStorage.getItem('luck-lab-arcade-v1')).chips"),chipsBefore);
+ await image("01-english");
+ await runJS("document.querySelector('[data-action=locale][data-lang=ja]').click()");
+ assert.equal(await runJS("document.documentElement.lang"),"ja");
  await click("slots");
  await image("02-slots");
  await runJS("document.querySelector('[data-mode=roulette]').click()");
