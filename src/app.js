@@ -1,6 +1,8 @@
 "use strict";
 (()=>{
-  const G=globalThis.VirtualArcade,KEY="luck-lab-arcade-v1";
+  const G=globalThis.VirtualArcade,KEY="luck-lab-arcade-v1",LANG_KEY="luck-lab-ui-locale";
+  let locale="ja";try{const v=localStorage.getItem(LANG_KEY);if(v==="en")locale="en"}catch(_e){}
+
   const root=document.getElementById("app");
   const money=x=>x.toLocaleString("ja-JP")+" C";
   const esc=v=>String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -56,16 +58,19 @@
     const bjHistory=s.history.filter(r=>r.game==="blackjack"),dealerVictories=bjHistory.filter(r=>!r.won&&r.outcome!=="push").length;
     const statsBJ=bjHistory.length?'<div class="house-standings"><div class="row"><span>ブラックジャック対戦数</span><strong>'+bjHistory.length+'</strong></div><div class="row"><span>ディーラー勝利</span><strong>'+dealerVictories+'回</strong></div><div class="row"><span>ディーラー勝率</span><strong>'+Math.round(dealerVictories/bjHistory.length*100)+'%</strong></div></div>':'<p class="sub">カード勝負を始めるとディーラーの勝率を表示します。</p>';
     const end=s.status!=="playing"?'<div class="end">30ラウンド終了、またはチップ不足でゲーム終了。最終残高 '+money(s.chips)+'</div>':'';
-    root.innerHTML='<div class="wrap"><div class="head"><div><div class="pill">OFFLINE VIRTUAL CHIPS ONLY · ALPHA 0.2.4</div><h1>LUCK <span class="gold">LAB</span></h1><p>3つのミニゲームと運の振れ幅を楽しむ、30ラウンド限定アーケード</p></div><button class="button alt" data-action="restart">最初から遊ぶ</button></div>'+
+    root.innerHTML='<div class="wrap"><div class="head"><div><div class="pill">OFFLINE VIRTUAL CHIPS ONLY · ALPHA 0.2.4</div><h1>LUCK <span class="gold">LAB</span></h1><p>3つのミニゲームと運の振れ幅を楽しむ、30ラウンド限定アーケード</p></div><div class="locale-controls"><button class="button alt" data-action="locale" data-lang="ja" aria-pressed="'+(locale==="ja")+'">日本語</button><button class="button alt" data-action="locale" data-lang="en" aria-pressed="'+(locale==="en")+'">English</button><button class="button alt" data-action="restart">最初から遊ぶ</button></div>'+
     (notice?'<div class="result bad">'+esc(notice)+'</div>':'')+
     '<div class="grid"><div>'+panel("ミニゲームを選ぶ",'<div class="tabs">'+[["slots","🎰 スロット"],["roulette","🎯 ルーレット"],["blackjack","🂡 ブラックジャック"]].map(v=>'<button class="button '+(s.mode===v[0]?"active":"alt")+'" data-action="mode" data-mode="'+v[0]+'" '+(s.pending?"disabled":"")+'>'+v[1]+'</button>').join("")+'</div>'+content())+end+'</div>'+
     '<aside>'+'<div class="stats">'+stats.map(v=>'<div class="stat"><small>'+v[0]+'</small><strong>'+v[1]+'</strong></div>').join("")+'</div><div class="round-progress" role="progressbar" aria-label="30ラウンドの進捗" aria-valuenow="'+s.rounds+'" aria-valuemin="0" aria-valuemax="'+G.MAX_ROUNDS+'"><div style="width:'+Math.round(s.rounds/G.MAX_ROUNDS*100)+'%"></div></div>'+
     panel("直近のラウンド結果",history)+panel("ディーラーの成績",statsBJ)+panel("遊び方と確率",transparentOdds())+'</aside></div>'+
     '<p class="note">このゲームのチップに金銭的価値はありません。現実のお金による購入、現金化、景品交換、外部送金、外部の賭博サイトとの接続は一切ありません。開発用Alphaであり販売は保留しています。</p></div>';
+    if(globalThis.GameTranslations&&root.ownerDocument)globalThis.GameTranslations.apply(root,locale);
   }
   document.addEventListener("change",event=>{const {id,value}=event.target;if(id==="stake")stake=Number(value);if(id==="choice")choice=value;if(id==="number")number=Number(value);if(id==="housemode"){const snap=JSON.stringify(s);try{G.setHouseMode(s,value);save();notice=""}catch(e){s=JSON.parse(snap);notice="変更できません："+e.message}}render()});
   document.addEventListener("click",event=>{const button=event.target.closest("[data-action]");if(!button||button.disabled)return;
     const a=button.dataset.action;
+    if(a==="locale"){if(!["ja","en"].includes(button.dataset.lang))return;locale=button.dataset.lang;
+      try{localStorage.setItem(LANG_KEY,locale)}catch(_e){}render();return;}
     if(a==="restart"){s=G.newGame((Date.now()>>>0)||1);notice="";save();render();return}
     const snapshot=JSON.stringify(s);
     try{
@@ -90,5 +95,5 @@
     const button=document.querySelector('[data-action="'+action+'"]');
     if(button&&!button.disabled){event.preventDefault();button.click();}
   });
-  render();
+  save();render();
 })();
