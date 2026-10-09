@@ -1,3 +1,10 @@
+## Alpha 0.3.0 — Japanese / English Interface
+
+- The same Windows development EXE contains **日本語 and English**. Use the top language buttons; Japanese is the default. Switching language does not change the odds, RNG seed, bankroll, rules or save.
+- Slots, roulette, Blackjack options, payout explanations, dealer advantage, statistics and chance rules have an English UI glossary (`src/i18n.js`), while internal IDs and ledger values remain stable.
+- Some narrative messages and detailed rule paragraphs can remain Japanese until manual translation review; **full English release certification is not yet complete**. Windows CI takes language-switched screenshots and checks preserved chips.
+- This uses one repository and one save format, not a separate fork for each language. **Commercial release remains HOLD** (including simulated gambling marketplace checks).
+
 # LUCK LAB — バーチャル・アーケード (Alpha 0.1)
 
 **完全オフラインの架空チップ・ゲーム**。スロット、欧州式ルーレット、簡易ブラックジャックを30ラウンド遊び、最終チップと勝敗履歴を振り返ります。現実のお金と交換できる資産は一切ありません。
