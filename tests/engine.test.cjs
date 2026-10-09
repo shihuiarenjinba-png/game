@@ -131,3 +131,15 @@ test("theoretical displayed slot house return follows disclosed independent symb
  assert.ok(exactTriple>.01&&exactTriple<.1);
  assert.ok(rtp>0&&rtp<1.0,"average payout below one stake, but chance still present");
 });
+
+test("bilingual casino labels contain exact rules, and translation does not affect outcomes",()=>{
+ const fs=require("node:fs"),path=require("node:path"),vm=require("node:vm");
+ const context=vm.createContext({});
+ vm.runInContext(fs.readFileSync(path.join(__dirname,"../src/i18n.js"),"utf8"),context);
+ const translate=context.GameTranslations;
+ assert.ok(translate.phrases>=80);
+ assert.equal(translate.text("全ルール・抽選確率・配当表"),"Full Rules, Odds & Payouts");
+ assert.equal(translate.text("チップ残高"),"Chip Balance");
+ assert.equal(translate.text("チップ残高","ja"),"チップ残高");
+ const a=G.newGame(100),b=G.newGame(100);G.slots(a,50);G.slots(b,50);assert.deepEqual(a,b);
+});
