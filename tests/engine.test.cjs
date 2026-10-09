@@ -84,7 +84,7 @@ test("offline UI changes modes and retains real results in local save",()=>{
  vm.runInContext(fs.readFileSync(path.join(__dirname,"../src/engine.js"),"utf8"),sandbox);
  vm.runInContext(fs.readFileSync(path.join(__dirname,"../src/app.js"),"utf8"),sandbox);
  const click=(action,mode)=>events.click({target:{closest:()=>({disabled:false,dataset:{action,mode}})}});
- assert.match(html,/LUCK/);click("slots");click("mode","roulette");click("roulette");click("mode","blackjack");click("blackjack");
+ assert.match(html,/LUCK/);assert.match(html,/全ルール・抽選確率・配当表/);assert.match(html,/18\/37/);assert.match(html,/3一致/);click("slots");click("mode","roulette");click("roulette");click("mode","blackjack");click("blackjack");
  const now=JSON.parse(map["luck-lab-arcade-v1"]);
  if(now.pending)click("stand");
  const end=JSON.parse(map["luck-lab-arcade-v1"]);assert.equal(end.rounds,3);assert.match(html,/ブラックジャック/);G.validate(end);
@@ -119,4 +119,15 @@ test("changing rules during an active hand is rejected, and old saved games use 
  const s=G.newGame(91);assert.equal(s.houseMode,"challenge");
  G.setHouseMode(s,"standard");assert.equal(s.houseMode,"standard");
  assert.throws(()=>G.setHouseMode(s,"impossible"),/不正/);
+});
+
+test("theoretical displayed slot house return follows disclosed independent symbol weights",()=>{
+ const p=G.WEIGHTS.map(w=>w/100);
+ assert.equal(p.reduce((a,b)=>a+b,0),1);
+ const anyMatch=p.reduce((a,x)=>a+x*x,0);
+ const exactTriple=p.reduce((a,x)=>a+x*x*x,0);
+ const rtp=p.reduce((a,x,i)=>a+2*x*x*(1-x)+G.THREE[i]*x*x*x,0);
+ assert.ok(anyMatch>.1&&anyMatch<.4);
+ assert.ok(exactTriple>.01&&exactTriple<.1);
+ assert.ok(rtp>0&&rtp<1.0,"average payout below one stake, but chance still present");
 });
