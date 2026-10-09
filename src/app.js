@@ -30,6 +30,21 @@
     const keyHint=s.mode==="blackjack"?'<p class="sub key-hint">キー操作：H＝ヒット / S＝スタンド / D＝ダブル</p>':'<p class="sub key-hint">キー操作：スペース＝スタート</p>';
     return controls+slotView+rouletteView+blackView+actions+keyHint+result;
   }
+  function transparentOdds(){
+    const probs=G.WEIGHTS.map(w=>w/100);
+    const pair=probs.reduce((a,p)=>a+p*p*(1-p),0);
+    const triples=probs.reduce((a,p)=>a+p*p*p,0);
+    const rtp=probs.reduce((a,p,i)=>a+2*p*p*(1-p)+G.THREE[i]*p*p*p,0);
+    const pct=x=>(x*100).toFixed(2)+"%";
+    return '<details class="rules-details" open><summary>全ルール・抽選確率・配当表</summary>'+
+      '<p class="sub">ゲームは端末内の疑似乱数で進行します。結果の再現性はありますが、勝つことは保証されません。乱数は現金賭博用ではありません。</p>'+
+      '<h3>🎰 スロット（3リール独立抽選）</h3><table class="log"><thead><tr><th>絵柄</th><th>1リール</th><th>3一致の総配当</th></tr></thead><tbody>'+
+      G.SYMBOLS.map((v,i)=>'<tr><td>'+v+'</td><td>'+G.WEIGHTS[i]+'%</td><td>'+G.THREE[i]+'倍</td></tr>').join('')+'</tbody></table>'+
+      '<p class="sub">左2つだけ一致は総配当2倍。2個以上一致：'+pct(pair+triples)+'／3個一致：'+pct(triples)+'。平均総払戻しは掛けた1Cに対して約'+rtp.toFixed(3)+'C（理論値、保証なし）。</p>'+
+      '<h3>🎯 欧州式ルーレット</h3><p class="sub">0〜36の37枠は全て同確率。赤黒・偶奇の的中確率は18/37＝'+pct(18/37)+'、総配当2倍。単一番号は1/37＝'+pct(1/37)+'、総配当36倍。0では赤黒・偶奇は不的中。</p>'+
+      '<h3>🂡 ブラックジャック</h3><p class="sub">Aは1/11、絵札10点、ディーラーは17点以上で停止。ヒット、スタンド、初手のみダブル。標準ルールは21超で失格・同点は賭金返却。ディーラー有利の架空モードではディーラーだけ23まで有効、同点は負け。ブラックジャックは選択で確率が変わるため固定勝率はありません。</p>'+
+      '<p class="sub">カードは1〜13の独立抽選を使う簡略版であり、共通の52枚デッキとは異なります。ディーラーの伏せ札は勝負終了時に公開します。</p></details>';
+  }
   function render(){
     const stats=[["チップ残高",money(s.chips)],["ラウンド",s.rounds+" / "+G.MAX_ROUNDS],["累積損益",(s.chips>=G.START?"+":"")+money(s.chips-G.START)],["プレイ状態",s.status==="playing"?"PLAYING":s.status==="complete"?"COMPLETE":"GAME OVER"]];
     const records=[...s.history].reverse().slice(0,10);
@@ -41,7 +56,7 @@
     (notice?'<div class="result bad">'+esc(notice)+'</div>':'')+
     '<div class="grid"><div>'+panel("ミニゲームを選ぶ",'<div class="tabs">'+[["slots","🎰 スロット"],["roulette","🎯 ルーレット"],["blackjack","🂡 ブラックジャック"]].map(v=>'<button class="button '+(s.mode===v[0]?"active":"alt")+'" data-action="mode" data-mode="'+v[0]+'" '+(s.pending?"disabled":"")+'>'+v[1]+'</button>').join("")+'</div>'+content())+end+'</div>'+
     '<aside>'+'<div class="stats">'+stats.map(v=>'<div class="stat"><small>'+v[0]+'</small><strong>'+v[1]+'</strong></div>').join("")+'</div><div class="round-progress" role="progressbar" aria-label="30ラウンドの進捗" aria-valuenow="'+s.rounds+'" aria-valuemin="0" aria-valuemax="'+G.MAX_ROUNDS+'"><div style="width:'+Math.round(s.rounds/G.MAX_ROUNDS*100)+'%"></div></div>'+
-    panel("直近のラウンド結果",history)+panel("ディーラーの成績",statsBJ)+panel("遊び方と確率",'<ul class="rule"><li>スロットは6絵柄の重み付き抽選。偶然の3一致に高倍率が付きます。</li><li>欧州式ルーレットは0〜36の37枠。赤黒・偶奇は2倍、単一番号は36倍の合計払戻し。</li><li>ブラックジャックには標準ルールとディーラー有利モード。後者はディーラー23点まで有効・引き分けは負け。変更は開始前のみ。</li><li>30ラウンドまで。チップ10C未満になるとゲームオーバー。</li></ul>')+'</aside></div>'+
+    panel("直近のラウンド結果",history)+panel("ディーラーの成績",statsBJ)+panel("遊び方と確率",transparentOdds())+'</aside></div>'+
     '<p class="note">このゲームのチップに金銭的価値はありません。現実のお金による購入、現金化、景品交換、外部送金、外部の賭博サイトとの接続は一切ありません。開発用Alphaであり販売は保留しています。</p></div>';
   }
   document.addEventListener("change",event=>{const {id,value}=event.target;if(id==="stake")stake=Number(value);if(id==="choice")choice=value;if(id==="number")number=Number(value);if(id==="housemode"){const snap=JSON.stringify(s);try{G.setHouseMode(s,value);save();notice=""}catch(e){s=JSON.parse(snap);notice="変更できません："+e.message}}render()});
