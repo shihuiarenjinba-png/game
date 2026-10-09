@@ -1,6 +1,6 @@
 {
   "name": "luck-lab-virtual-arcade",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "private": true,
   "description": "Offline simulated arcade with virtual-only chips: slots roulette and blackjack",
   "scripts": {
