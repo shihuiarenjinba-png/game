@@ -1,0 +1,57 @@
+{
+  "name": "luck-lab-virtual-arcade",
+  "version": "0.3.0",
+  "private": true,
+  "description": "Offline simulated arcade with virtual-only chips: slots roulette and blackjack",
+  "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "dev": "electron .",
+    "test:desktop": "electron desktop/smoke.cjs",
+    "build:win": "electron-builder --win --x64 --publish never"
+  },
+  "main": "desktop/main.cjs",
+  "devDependencies": {
+    "electron": "44.6.0",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "jp.lucklab.arcade",
+    "productName": "LUCK LAB",
+    "asar": true,
+    "files": [
+      "index.html",
+      "src/**/*.js",
+      "src/**/*.css",
+      "desktop/main.cjs",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "artifactName": "LUCK-LAB-Setup-${version}-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "LUCK-LAB-Portable-${version}-${arch}.${ext}"
+    }
+  }
+}
