@@ -1,0 +1,5 @@
+/* v80: credit information is quiet; casino stage stays visually dominant */
+.v80-risk {margin:14px 0 2px;padding:12px 14px;border:1px solid #8a7649;background:#14342d;border-radius:5px;font-family:'Yu Mincho','Hiragino Mincho ProN',serif;color:#e9dcc5}
+.v80-risk h3{margin:0 0 8px;font-weight:700;font-size:17px;color:#f3d79f}
+.v80-risk p{font-size:13px;line-height:1.6;margin:5px 0}.v80-risk .v80-paired{display:grid;grid-template-columns:1fr 1fr;gap:9px}.v80-risk .v80-paired>span{padding:8px;border:1px solid #355b4f;background:#153026;border-radius:3px}
+@media(max-width:480px){.v80-risk .v80-paired{grid-template-columns:1fr}}

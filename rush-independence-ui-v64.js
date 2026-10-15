@@ -1,0 +1,4 @@
+/* v64 learning widget alongside v63 distribution; purely mathematical. */
+(function(){'use strict';const host=document.getElementById('rushV64Independence'),api=window.RushIndependenceV64,select=document.getElementById('rushV64Previous');if(!host||!api||!select)return;
+function render(){const n=Number(select.value),a=api.explain(n),en=document.documentElement.lang==='en',fmt=p=>(p*100).toFixed(2)+'%';host.textContent=en?`After ${n} previous wins: NEXT hit ${fmt(a.nextWin)} / end ${fmt(a.nextLoss)}. Next 3 hits in a row ${fmt(a.atLeastUpcomingWins)}. Previous streaks NEVER improve the next draw.`:`過去に${n}連していても、次の継続 ${fmt(a.nextWin)} ／終了 ${fmt(a.nextLoss)}。ここから3回連続で継続する確率 ${fmt(a.atLeastUpcomingWins)}。過去の当選回数は次回の確率を高めません。`;}
+select.addEventListener('change',render);document.getElementById('lang')?.addEventListener('click',render);render();})();

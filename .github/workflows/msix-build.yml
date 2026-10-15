@@ -1,0 +1,72 @@
+name: LUCK LAB v85 MSIX / manual release gate
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'release/luck-lab-v85-msix-*'
+permissions:
+  contents: read
+concurrency:
+  group: luck-lab-msix-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  quality-and-msix:
+    runs-on: windows-latest
+    timeout-minutes: 70
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      LUCK_STORE_IDENTITY_NAME: ${{ vars.LUCK_STORE_IDENTITY_NAME }}
+      LUCK_STORE_PUBLISHER: ${{ vars.LUCK_STORE_PUBLISHER }}
+      LUCK_STORE_PUBLISHER_DISPLAY_NAME: ${{ vars.LUCK_STORE_PUBLISHER_DISPLAY_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned packaging toolchain
+        run: npm install --no-audit --no-fund
+      - name: Source tests and relative file checks
+        run: npm test
+      - name: Real Windows Electron smoke and save persistence
+        run: npm run test:desktop
+      - name: Upload Windows smoke screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: luck-lab-v85-WINDOWS-SMOKE-${{ github.sha }}
+          path: smoke-output/*.png
+          if-no-files-found: warn
+      - name: Reject missing Partner Center identity
+        run: npm run make:config
+      - name: Build actual x64 MSIX (not renamed AppX)
+        run: npm run build:msix
+      - name: Verify real MSIX output, hash, and source SHA
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $msix = @(Get-ChildItem dist -Filter '*.msix' -File -Recurse)
+          if ($msix.Count -lt 1) { throw 'No .msix output; DO NOT claim MSIX complete' }
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          foreach ($f in $msix) {
+            $zip = [IO.Compression.ZipFile]::OpenRead($f.FullName)
+            try {
+              if (-not ($zip.Entries.FullName -contains 'AppxManifest.xml')) { throw "Missing AppxManifest.xml: $($f.Name)" }
+              if (-not ($zip.Entries.FullName -contains 'AppxBlockMap.xml')) { throw "Missing block map: $($f.Name)" }
+            } finally { $zip.Dispose() }
+            "$(Get-FileHash $f.FullName -Algorithm SHA256 | Select-Object -ExpandProperty Hash)  $($f.Name)" | Out-File dist/SHA256SUMS.txt -Append
+          }
+          "git_commit=$env:GITHUB_SHA" | Out-File dist/BUILD_SOURCE.txt
+          "github_ref=$env:GITHUB_REF" | Out-File dist/BUILD_SOURCE.txt -Append
+      - name: Upload build products (not Store approved)
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: luck-lab-v85-MSIX-PRE-CERTIFICATION-${{ github.sha }}
+          path: |
+            dist/*.msix
+            dist/*.msixbundle
+            dist/*.msixupload
+            dist/SHA256SUMS.txt
+            dist/BUILD_SOURCE.txt
+          if-no-files-found: error
+          retention-days: 30

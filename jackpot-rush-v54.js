@@ -1,0 +1,14 @@
+/* Fictional play-money only. A Markov chain with a rare entry and repeatable RUSH.
+   Not a simulation of a particular commercial machine or real gambling product. */
+(function(root,factory){const api=factory();if(typeof module!=='undefined'&&module.exports)module.exports=api;root.JackpotRushV54=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){'use strict';
+const ENTRY=1/200,CONTINUE=.72,ENTRY_MULTIPLIER=189,REPEAT_MULTIPLIER=4,MAX_WAGER=1000;
+function fresh(){return {active:false,stake:0,streak:0,totalPayout:0,paidSpins:0};}
+function valid(s){return !!s&&typeof s==='object'&&typeof s.active==='boolean'&&Number.isSafeInteger(s.stake)&&s.stake>=0&&s.stake<=MAX_WAGER&&Number.isSafeInteger(s.streak)&&s.streak>=0&&s.streak<=100000&&Number.isSafeInteger(s.totalPayout)&&s.totalPayout>=0&&s.totalPayout<=1e12&&Number.isSafeInteger(s.paidSpins)&&s.paidSpins>=0&&s.paidSpins<=100000&&(!s.active||(s.stake>=1&&s.streak>=1&&s.paidSpins>=1));}
+function theory(){const rounds=1/ENTRY+1/(1-CONTINUE);const rewards=ENTRY_MULTIPLIER+REPEAT_MULTIPLIER*CONTINUE/(1-CONTINUE);return {entryChance:ENTRY,continueChance:CONTINUE,entryMultiplier:ENTRY_MULTIPLIER,repeatMultiplier:REPEAT_MULTIPLIER,rtp:rewards/rounds,expectedRoundsPerCycle:rounds};}
+function play(wallet,requestedWager,state=fresh(),random=Math.random){if(!valid(state))throw Error('invalid RUSH state');if(!Number.isSafeInteger(wallet)||wallet<0||!Number.isSafeInteger(requestedWager)||requestedWager<1||requestedWager>MAX_WAGER)throw Error('invalid credits or stake');const wager=state.active?state.stake:requestedWager;if(wager>wallet)throw Error('insufficient credits');const draw=random();if(!(Number.isFinite(draw)&&draw>=0&&draw<1))throw Error('invalid random draw');const before=state.active,win=draw<(before?CONTINUE:ENTRY),multiplier=win?(before?REPEAT_MULTIPLIER:ENTRY_MULTIPLIER):0,payout=wager*multiplier;
+ let next=fresh();let event='MISS';if(win){next={active:true,stake:wager,streak:before?state.streak+1:1,totalPayout:(before?state.totalPayout:0)+payout,paidSpins:before?state.paidSpins+1:1};event=before?'RUSH_HIT':'ENTRY_HIT';}else if(before){event='RUSH_END';}
+ return {game:'rush',wager,payout,net:payout-wager,newWallet:wallet-wager+payout,draw,win,event,multiplier,state:next,previousState:state,cyclePayout:win?next.totalPayout:(before?state.totalPayout:0),cycleMultiplier:win?next.totalPayout/wager:(before?state.totalPayout/wager:0),streak:win?next.streak:(before?state.streak:0)};
+}
+function probability(){return {entryAfter50:1-Math.pow(1-ENTRY,50),entryAfter200:1-Math.pow(1-ENTRY,200),entryAfter500:1-Math.pow(1-ENTRY,500),fiveOrMoreHits:Math.pow(CONTINUE,4),tenOrMoreHits:Math.pow(CONTINUE,9),expectedHitsOnceEntered:1/(1-CONTINUE),expectedNetPerStake:theory().rtp-1};}
+return {fresh,valid,play,theory,probability,ENTRY,CONTINUE,ENTRY_MULTIPLIER,REPEAT_MULTIPLIER};
+});

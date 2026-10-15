@@ -1,0 +1,39 @@
+/* v79 • House ledger & floor styling; no gameplay mechanics. CSS ink, felt and brass; no borrowed imagery. */
+#v79Ledger{color:#e7ddc7;border:1px solid #9e8056;border-radius:9px;background:linear-gradient(125deg,#182c2c,#0c201f);box-shadow:0 10px 28px #050e13a0;margin:13px 0 20px;padding:18px 20px;position:relative;overflow:hidden}
+#v79Ledger:before{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(100deg,#fff0 0,#ffffff06 1px,#fff0 4px);opacity:.5}
+.v79-ink-title{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:1px solid #94785576;padding-bottom:11px;position:relative}
+.v79-ink-title h2{font:700 clamp(18px,2.5vw,27px)/1.3 'Yu Mincho','Hiragino Mincho ProN',Georgia,serif;letter-spacing:.07em;color:#f3e1b7;margin:0}
+.v79-ink-title span{font:700 10px/1.5 Georgia,serif;letter-spacing:.18em;color:#c5aa7a}
+.v79-columns{display:grid;grid-template-columns:1.1fr .9fr;gap:22px;margin-top:15px;position:relative}
+.v79-big-number{font:700 clamp(23px,3.5vw,38px)/1.3 Georgia,'Yu Mincho',serif;color:#eed09c;font-variant-numeric:tabular-nums}
+.v79-small-head{display:block;color:#c4c9bc;font-size:12px;line-height:1.45;margin:0 0 3px}
+.v79-progress-track{margin:12px 0 6px;border-radius:2px;background:#102a28;height:9px;overflow:hidden;border:1px solid #65776455}
+.v79-progress-bar{height:100%;width:0;background:linear-gradient(90deg,#6d9e86,#e8c08a);transition:width .2s ease}
+.v79-finance-metrics{display:grid;grid-template-columns:1fr 1fr;gap:11px 14px;margin:11px 0 0}.v79-finance-metrics strong{font:700 17px/1.3 Georgia,'Yu Gothic',sans-serif;font-variant-numeric:tabular-nums;color:#eee3c9}
+.v79-text{font-size:12px;line-height:1.65;color:#d5d4c7;margin:9px 0 0;min-height:21px}
+.v79-tools{display:flex;flex-direction:column;gap:8px}.v79-tools h3{font-size:14px;letter-spacing:.06em;color:#f0dec2;margin:0 0 3px}.v79-preset-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+#v79Ledger button{padding:10px 5px;border:1px solid #a48b64;border-radius:3px;background:#344943;color:#f8ead2;min-width:0;min-height:40px;font-size:12px;font-weight:750;cursor:pointer}
+#v79Ledger button:hover:not(:disabled),#v79Ledger button:focus-visible{background:#516c5e;border-color:#e5c18a;outline-offset:2px}#v79Ledger button:disabled{opacity:.45;cursor:not-allowed}
+#v79Ledger[data-state=clear] .v79-big-number{color:#a5d6b5}#v79Ledger[data-state=blocked]{border-color:#d59b82}
+.v79-last{border-top:1px solid #92744a77;margin-top:12px;padding-top:10px;display:flex;flex-wrap:wrap;gap:7px;justify-content:space-between;color:#dfc9aa;font-size:12px;line-height:1.5}
+/* The six booths share physical-game typography and warm borders, not generic dashboard chrome. */
+#v73OtherGames>section{border-radius:9px;border-color:#846e4f;background:linear-gradient(135deg,#102c2b,#0b2028);box-shadow:0 12px 25px #07111c88;padding:16px}
+#v73OtherGames>section h2{font-family:'Yu Mincho','Hiragino Mincho ProN',Georgia,serif;color:#e9ca92;font-size:clamp(18px,2.1vw,24px);letter-spacing:.04em}
+#v73OtherGames>section button{border-radius:4px;min-height:43px;background:#38645d;color:#f7e8cd;border:1px solid #94a080;font-weight:700}
+#v73OtherGames>section button:hover:not(:disabled){background:#547b69}
+#rushHomeV73{border-color:#8e7550!important}
+#v77Chinchiro,#v78Dealer{scroll-margin-top:14px}
+.v78-floor-guide a:focus-visible,#v79Ledger button:focus-visible{outline:2px solid #f7d395}
+@media(max-width:780px){.v79-columns{grid-template-columns:1fr;gap:15px}#v79Ledger{padding:15px}}
+@media(max-width:380px){.v79-preset-row{grid-template-columns:1fr}.v79-finance-metrics{gap:9px}.v79-last{display:block}}
+@media(prefers-reduced-motion:reduce){.v79-progress-bar{transition:none}}
+
+/* A quiet, collapsible credit office keeps the games—not finance dashboards—on the stage. */
+.v79-drawer{margin:16px 0 22px;border:1px solid #a58a5f;border-radius:8px;background:#101f22;scroll-margin-top:12px}
+.v79-drawer>summary{cursor:pointer;padding:14px 18px;display:flex;justify-content:space-between;gap:13px;align-items:center;flex-wrap:wrap;color:#edcf97;font:700 17px/1.45 'Yu Mincho',Georgia,serif;list-style:revert}
+.v79-drawer>summary strong{color:#d6d1c0;font:600 12px/1.5 'Yu Gothic',system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.v79-drawer[open]>summary{border-bottom:1px solid #9f825255;background:#1b302d}
+.v79-drawer #v76BankPanel{margin:12px 10px}
+.v79-drawer #v79Ledger{margin:12px 10px 14px}
+.v78-floor-guide .v79-credit-link{font-size:11px;min-height:0;padding:3px 7px;border-color:#82704f;background:#2e3930;color:#e7d4af!important}
+@media(max-width:600px){.v79-drawer>summary{font-size:15px}.v78-floor-guide .v79-credit-link{margin-left:auto}}
