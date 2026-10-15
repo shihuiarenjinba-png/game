@@ -2,7 +2,7 @@
 
 **State: SOURCE/PACKAGING HANDOFF READY, MSIX NOT BUILT, MICROSOFT STORE HOLD.**
 
-This is a **new, self-contained** source tree based on the v85 seven-game browser version. The previous GitHub `main` and `feature/offline-casino-arcade-alpha` are deliberately preserved. The current staging branch `release/luck-lab-v85-msix-20261015` contains only a protective staging README until the full source is imported.
+This is a **new, self-contained** source tree based on the v85 seven-game browser version. The previous GitHub `main` and `feature/offline-casino-arcade-alpha` are deliberately preserved. The dedicated `release/luck-lab-v85-msix-20261015` branch now contains the full v85 source tree. `main` and `feature/offline-casino-arcade-alpha` are preserved. MSIX has not been built and Microsoft Store release is HOLD.
 
 ## Architecture
 
@@ -18,7 +18,7 @@ This is a **new, self-contained** source tree based on the v85 seven-game browse
 
 1. Extract this entire archive on a Windows PC. Install Git and Node.js 22.
 2. Run `npm test` (source tests; does not require Electron download).
-3. Run `powershell -ExecutionPolicy Bypass -File .\scripts\IMPORT_TO_GITHUB.ps1` from the extracted folder. This requires GitHub authentication. It never edits `main` or the historical alpha branch. Record the emitted **GitHub source commit SHA**.
+3. The full source has been imported into the dedicated GitHub branch. Before changing it, check the branch HEAD and verify source file hashes. `scripts/IMPORT_TO_GITHUB.ps1` is retained only as a recovery utility and must not overwrite newer branch changes.
 4. Set GitHub repository **Actions variables** `LUCK_STORE_IDENTITY_NAME`, `LUCK_STORE_PUBLISHER`, `LUCK_STORE_PUBLISHER_DISPLAY_NAME` to the **actual Microsoft Partner Center package identity and publisher**, not a guessed value. Check the exact string. Do not print certificates or secrets into build logs.
 5. Use GitHub Actions `LUCK LAB v85 MSIX / manual release gate` on the verified branch. The build requires Windows and pins `electron-builder@27.0.0-alpha.10` because the separate `msix` target is beta and not stable in electron-builder v26.
 6. Download the Actions artifacts for that same commit and check `BUILD_SOURCE.txt`, `SHA256SUMS.txt`, manifest (`AppxManifest.xml`), and actual `.msix` file. `.appx` and `.zip` renamed to `.msix` are invalid substitutes.
