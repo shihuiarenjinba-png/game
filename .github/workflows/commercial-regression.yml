@@ -1,0 +1,20 @@
+name: LUCK LAB v85 integrity investigation
+on:
+  push:
+    branches: ["feature/commercial-integrity-ux-20261018"]
+  workflow_dispatch:
+jobs:
+  forensics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate integrity reporting tool
+        run: npm run test:integrity-helper
+      - name: Enforce original v85 source SHA-256 (fail on mismatch)
+        run: npm run audit:integrity
