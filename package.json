@@ -13,7 +13,8 @@
     "make:config": "node scripts/prepare-msix-config.cjs",
     "build:msix": "npm run make:config && electron-builder --win msix --x64 --config electron-builder.generated.json --publish never",
     "audit:integrity": "node scripts/integrity-report.cjs",
-    "test:integrity-helper": "node --test tests/integrity-report.test.cjs"
+    "test:integrity-helper": "node --test tests/integrity-report.test.cjs",
+    "audit:origin": "node scripts/audit-source-history.cjs"
   },
   "devDependencies": {
     "electron": "44.6.0",
