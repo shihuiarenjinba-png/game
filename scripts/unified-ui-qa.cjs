@@ -1,13 +1,14 @@
 "use strict";
 const {chromium}=require("playwright"),assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path"),url=require("node:url");
 const config=JSON.parse(fs.readFileSync(path.join(__dirname,"unified-ui-qa-config.json"),"utf8"));
+const landing=config.landingFile||"index.html";
 const output=path.resolve("unified-ui-evidence");fs.mkdirSync(output,{recursive:true});
 (async()=>{
  const browser=await chromium.launch({headless:true}),errors=[],network=[];
  try{
   const ctx=await browser.newContext({viewport:{width:1280,height:720}}),p=await ctx.newPage();
   const listen=x=>{x.on("pageerror",e=>errors.push(e.message));x.on("request",r=>{if(/^https?:/.test(r.url()))network.push(r.url());});x.on("dialog",d=>d.accept());};
-  listen(p);await p.goto(url.pathToFileURL(path.resolve("index.html")).href,{waitUntil:"load"});
+  listen(p);await p.goto(url.pathToFileURL(path.resolve(landing)).href,{waitUntil:"load"});
   const title=await p.title();assert.ok(title.length>4,"missing game window title");
   const text=await p.locator("body").innerText();assert.ok(text.length>60,"game content not painted");
   await p.screenshot({path:path.join(output,"01-desktop-1280x720.png"),fullPage:true});
@@ -21,7 +22,7 @@ const output=path.resolve("unified-ui-evidence");fs.mkdirSync(output,{recursive:
    await p.screenshot({path:path.join(output,"02-second-tab-1280x720.png"),fullPage:true});
   }
   const mobile=await browser.newContext({viewport:{width:1024,height:768}}),q=await mobile.newPage();
-  listen(q);await q.goto(url.pathToFileURL(path.resolve("index.html")).href,{waitUntil:"load"});
+  listen(q);await q.goto(url.pathToFileURL(path.resolve(landing)).href,{waitUntil:"load"});
   const metrics=await q.evaluate(()=>({scrollWidth:document.documentElement.scrollWidth,viewport:innerWidth}));
   assert.ok(metrics.scrollWidth<=metrics.viewport+2,"horizontal overflow at 1024px: "+JSON.stringify(metrics));
   await q.screenshot({path:path.join(output,"03-compact-1024x768.png"),fullPage:true});
@@ -32,7 +33,7 @@ const output=path.resolve("unified-ui-evidence");fs.mkdirSync(output,{recursive:
   else assert.doesNotMatch(copy,/開発版のため販売は未開始/);
   if(config.entranceSelector){
    await q.locator(config.entranceSelector).click();
-   assert.notEqual(q.url(),url.pathToFileURL(path.resolve("index.html")).href,"entrance should navigate into game");
+   assert.notEqual(q.url(),url.pathToFileURL(path.resolve(landing)).href,"entrance should navigate into game");
    await q.screenshot({path:path.join(output,"04-entered-game-1024x768.png"),fullPage:true});
   }
   assert.deepEqual(errors,[],"browser runtime error");
