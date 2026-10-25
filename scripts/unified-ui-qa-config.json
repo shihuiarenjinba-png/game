@@ -1,5 +1,6 @@
 {
   "product": "LUCK LAB",
   "entranceSelector": "a.enter",
-  "devCopyHold": true
+  "devCopyHold": false,
+  "landingFile": "store-entry.html"
 }
