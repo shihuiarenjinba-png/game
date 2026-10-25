@@ -24,6 +24,7 @@ test("buyer landing differs from original protected source by exactly one remove
 test("actual Electron entry and MSIX package point at the clean buyer landing",()=>{
  const main=read("desktop/main.cjs"),config=read("scripts/prepare-msix-config.cjs");
  assert.match(main,/loadFile\(path\.join\(__dirname,'\.\.','store-entry\.html'\)\)/);
- assert.match(config,/files:\['index\.html','store-entry\.html','luck-lab\.html'/);
+ assert.match(config,/files:\['store-entry\.html','luck-lab\.html'/);
+ assert.doesNotMatch(config,/files:\['index\.html'/,"archived development index must not ship");
  assert.match(read("desktop/smoke.cjs"),/loadFile\(path\.resolve\('store-entry\.html'\)\)/);
 });
