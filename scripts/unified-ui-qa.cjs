@@ -41,6 +41,15 @@ const output=path.resolve("unified-ui-evidence");fs.mkdirSync(output,{recursive:
   if(config.entranceSelector){
    await q.locator(config.entranceSelector).click();
    assert.notEqual(q.url(),url.pathToFileURL(path.resolve(landing)).href,"entrance should navigate into game");
+   for(const selector of ["#rushHomeV73","#v75RouletteWheel","#slotPlay","#dicePlay"])
+    assert.equal(await q.locator(selector).count(),1,"missing actual playable game component "+selector);
+   const roundtrip=await q.evaluate(()=>{localStorage.setItem("luck-lab-qa-temporary","safe");return localStorage.getItem("luck-lab-qa-temporary");});
+   assert.equal(roundtrip,"safe");
+   await q.reload();
+   assert.equal(await q.evaluate(()=>localStorage.getItem("luck-lab-qa-temporary")),"safe","player game save storage must survive reload");
+   await q.evaluate(()=>localStorage.removeItem("luck-lab-qa-temporary"));
+   const gameplay=await q.locator("body").innerText();
+   assert.doesNotMatch(gameplay,/QA_UNSIGNED|GitHub Actions|Store Identity|WACK|開発工程|開発版のため販売は未開始/);
    await q.screenshot({path:path.join(output,"04-entered-game-1024x768.png"),fullPage:true});
   }
   assert.deepEqual(errors,[],"browser runtime error");
