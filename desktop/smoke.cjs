@@ -5,7 +5,7 @@ const OUT=path.resolve('smoke-output');
 async function main(){
  const w=new BrowserWindow({width:1280,height:850,show:false,webPreferences:{sandbox:true,nodeIntegration:false,contextIsolation:true}});
  w.webContents.setWindowOpenHandler(()=>({action:'deny'}));
- await w.loadFile(path.resolve('index.html'));
+ await w.loadFile(path.resolve('store-entry.html'));
  const initial=await w.webContents.executeJavaScript(`document.querySelectorAll('.board').length`);
  if(initial!==7)throw Error(`Landing screen has ${initial} game tables, expected 7`);
  await fs.promises.mkdir(OUT,{recursive:true});
