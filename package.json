@@ -6,7 +6,7 @@
   "main": "desktop/main.cjs",
   "license": "UNLICENSED",
   "scripts": {
-    "test": "node scripts/check-package.cjs && node test_luck_experience_v79.js && node test_v80_credit_recovery.js && node test_v81_dealer_balance.js && node test_v82_rules.js && node tests/test_v82_rules.js && node test_v83_squeeze.js && node test_v84_story.js && node test_v85_story.js",
+    "test": "node scripts/check-package.cjs && node test_luck_experience_v79.js && node test_v80_credit_recovery.js && node test_v81_dealer_balance.js && node test_v82_rules.js && node tests/test_v82_rules.js && node test_v83_squeeze.js && node test_v84_story.js && node test_v85_story.js && node --test tests/store-entry.test.cjs",
     "preflight": "node scripts/check-package.cjs",
     "test:desktop": "electron desktop/smoke.cjs",
     "start": "electron .",
