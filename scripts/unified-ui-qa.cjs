@@ -83,6 +83,19 @@ const output=path.resolve("unified-ui-evidence");fs.mkdirSync(output,{recursive:
     return {schema:value.schema,balance:value.balance,storyPhase:value.storyV85?.phase};
    });
    assert.deepEqual(afterReload,beforeReload,"real game credits and story progress must survive restart");
+
+   // Run one real virtual-chip slot round and verify the ledger, not just startup.
+   const roundBefore=await q.evaluate(()=>JSON.parse(localStorage.getItem("lucklab:credits:v4")));
+   assert.equal(await q.locator("#slotPlay").isEnabled(),true,"slot round must be playable");
+   await q.locator("#slotPlay").click();
+   const roundAfter=await q.evaluate(()=>JSON.parse(localStorage.getItem("lucklab:credits:v4")));
+   assert.equal(roundAfter.lastOutcome?.which,"slots","slot spin must record an actual round");
+   assert.equal(roundAfter.historyList.length,roundBefore.historyList.length+1);
+   assert.equal(roundAfter.balance,roundBefore.balance+roundAfter.lastOutcome.net,
+     "virtual chip balance must match the saved slot net result");
+   await q.reload({waitUntil:"load"});
+   const savedRound=await q.evaluate(()=>JSON.parse(localStorage.getItem("lucklab:credits:v4")));
+   assert.deepEqual(savedRound,roundAfter,"real slot history and balance must survive restart");
    const gameplay=await q.locator("body").innerText();
    assert.doesNotMatch(gameplay,/QA_UNSIGNED|GitHub Actions|Store Identity|WACK|開発工程|開発版のため販売は未開始/);
    await q.screenshot({path:path.join(output,"04-entered-game-1024x768.png"),fullPage:false});
