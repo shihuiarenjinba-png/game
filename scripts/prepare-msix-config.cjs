@@ -13,7 +13,7 @@ if (!/^CN=/i.test(publisher))throw Error('Publisher must exactly match Partner C
 const config={
  appId:'jp.lucklab.arcade',productName:'LUCK LAB',asar:true,
  directories:{output:'dist',buildResources:'build'},
- files:['index.html','luck-lab.html','*.js','*.css','desktop/main.cjs','package.json','!test*.js','!QA_*.md','!START_*.md','!docs/**'],
+ files:['index.html','store-entry.html','luck-lab.html','*.js','*.css','desktop/main.cjs','package.json','!test*.js','!QA_*.md','!START_*.md','!docs/**'],
  win:{target:[{target:'msix',arch:['x64']}]},
  msix:{identityName,publisher,publisherDisplayName,displayName:'LUCK LAB',languages:['ja-JP'],createMsixupload:true}
 };
