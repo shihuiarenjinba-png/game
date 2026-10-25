@@ -32,7 +32,7 @@ function createWindow(){
   });
   win.webContents.on('will-attach-webview',e=>e.preventDefault());
   win.once('ready-to-show',()=>win.show());
-  win.loadFile(path.join(__dirname,'..','index.html'));
+  win.loadFile(path.join(__dirname,'..','store-entry.html'));
 }
 app.whenReady().then(()=>{
   // Browser localStorage persists in the stable Windows app profile.
