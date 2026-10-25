@@ -2,5 +2,7 @@
   "product": "LUCK LAB",
   "entranceSelector": "a.enter",
   "devCopyHold": false,
-  "landingFile": "store-entry.html"
+  "landingFile": "store-entry.html",
+  "expectedTabs": 0,
+  "landingCards": 7
 }
