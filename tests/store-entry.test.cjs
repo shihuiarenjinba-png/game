@@ -16,7 +16,7 @@ test("buyer landing differs from original protected source by exactly one remove
  const original=read("index.html"),shop=read("store-entry.html");
  assert.ok(original.includes(banned));
  assert.equal(original.split(banned).length,2,"expected a unique development disclaimer");
- assert.equal(shop,original.replace(banned,""),"do not edit story, safety notices, links or layout");
+ assert.equal(shop.replace(/\r\n/g,"\n"),original.replace(banned,"").replace(/\r\n/g,"\n"),"only CRLF/LF checkout normalization is permitted; buyer copy and layout must otherwise be identical");
  assert.doesNotMatch(shop,/開発版のため販売は未開始です/);
  assert.match(shop,/すべてゲーム内の仮想チップです/);
  assert.match(shop,/href="luck-lab.html"/);
