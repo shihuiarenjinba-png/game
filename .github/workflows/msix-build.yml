@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'release/luck-lab-v85-msix-*'
+      - 'work/unified-qa-20261025'
 permissions:
   contents: read
 concurrency:
